@@ -58,6 +58,14 @@ export default class App extends React.PureComponent {
 		});
 	};
 
+	onToggleImportant = (id) => {
+		console.log('On Important Work' , id);
+	};
+
+	onToggleDone = (id) => {
+		console.log('On Done Work' , id);
+	};
+
 	render() {
 		return (
 			<div className="buyit-app">
@@ -72,7 +80,9 @@ export default class App extends React.PureComponent {
 
 				<PurchaseList
 					purchases={this.state.purchaseData}
-					onDeleted={ this.deleteItem }/>
+					onDeleted={ this.deleteItem}
+					onToggleImportant={this.onToggleImportant}
+					onToggleDone={this.onToggleDone} />
 
 				<PurchaseListItemAdd onItemAdded = { this.addItem } />
 			</div>

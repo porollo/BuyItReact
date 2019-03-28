@@ -4,30 +4,8 @@ import './purchase-list-item.css';
 
 export default class PurchaseListItem extends React.Component {
 
-  state = {
-    done: false,
-    important: false
-  };
-
-  onLabelClick = () => {
-    this.setState(({done}) => {
-      return {
-        done: !done
-      };
-    });
-  };
-
-  onImportant = () => {
-    this.setState(({important}) => {
-      return {
-        important: !important
-      };
-    });
-  };
-
   render() {
-    const { label,onDeleted } = this.props;
-    const { done, important } = this.state;
+    const { label,onDeleted, onToggleImportant, onToggleDone, done, important } = this.props;
 
     let classNames = 'purchase-list-item';
     if (done) {
@@ -42,19 +20,19 @@ export default class PurchaseListItem extends React.Component {
       <span className={classNames}>
         <span
           className="purchase-list-item-label"
-          onClick={ this.onLabelClick }>
+          onClick={ onToggleDone }>
           {label}
         </span>
 
         <button type="button"
                 className="btn btn-outline-danger btn-sm float-right"
-        onClick={onDeleted}>
+                onClick={onDeleted}>
           <i className="fa fa-trash-o" />
         </button>
 
         <button type="button"
                 className="btn btn-outline-success btn-sm float-right"
-                onClick={this.onImportant}>
+                onClick={ onToggleImportant }>
           <i className="fa fa-exclamation" />
         </button>
 

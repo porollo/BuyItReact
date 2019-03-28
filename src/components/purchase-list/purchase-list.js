@@ -4,7 +4,7 @@ import PurchaseListItem from '../purchase-list-item/purchase-list-item';
 import './purchase-list.css';
 
 
-const PurchaseList = ({ purchases, onDeleted }) => {
+const PurchaseList = ({ purchases, onDeleted, onToggleImportant, onToggleDone }) => {
 
     const elements = purchases.map((item) => {
       const { id, ...itemProps} = item;
@@ -12,7 +12,10 @@ const PurchaseList = ({ purchases, onDeleted }) => {
         return (
             <li key={id} className="list-group-item">
               <PurchaseListItem { ...itemProps }
-                onDeleted={() => onDeleted(id) } />
+                onDeleted={() => onDeleted(id) }
+                onToggleImportant={() => onToggleImportant(id) }
+                onToggleDone={() => onToggleDone(id) }
+              />
             </li> )
     });
 
