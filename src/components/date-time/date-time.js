@@ -10,7 +10,7 @@ export default class DateTime extends React.Component {
 
 		return (
 			<div className="date-time">
-				<span>{Moment().format('dddd MMMM YYYY hh:mm')}</span>
+				<span>{Moment().format('DD MMMM YYYY HH:MM')}</span>
 			</div>
 		)
 	}
