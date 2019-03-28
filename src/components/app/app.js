@@ -16,34 +16,38 @@ export default class App extends React.PureComponent {
 
 	state = {
 		purchaseData: [
-			{label: 'Beer', important: false, id: 1},
-			{label: 'Bread', important: true, id: 2},
-			{label: 'Milk', important: false, id: 3},
-			{label: 'Other', important: false, id: 4},
-		]
+			this.createPurchaseItem('Beer'),
+			this.createPurchaseItem('Bread'),
+			this.createPurchaseItem('Milk'),
+			this.createPurchaseItem('Other'),
+		],
+		searchFilter: '',
+		purchaseFilter: 'all'
 	};
+
+	createPurchaseItem(label) {
+		return {
+			label,
+			important: false,
+			done: false,
+			id: this.maxId++
+		}
+	}
 
 	deleteItem = (id) => {
 		this.setState(({ purchaseData }) => {
 			const idx = purchaseData.findIndex((el) => el.id === id );
-
 			const arrayBefore = purchaseData.slice(0, idx);
 			const arrayAfter = purchaseData.slice(idx + 1);
 			const newArray = [...arrayBefore, ...arrayAfter];
-
 			return {
 				purchaseData: newArray
 			}
-
 		});
 	};
 
 	addItem = (text) => {
-		const newItem = {
-			label: text,
-			important: false,
-			id: this.maxId++
-		};
+		const newItem = this.createPurchaseItem(text);
 
 		this.setState(({ purchaseData }) => {
 			const newArray = [
@@ -58,31 +62,95 @@ export default class App extends React.PureComponent {
 		});
 	};
 
+	toggleProperty(arr, id, propName) {
+
+		const idx = arr.findIndex((el) => el.id === id );
+		const oldItem = arr[idx];
+		const newItem = {...oldItem, [propName]: !oldItem[propName]};
+
+		return [
+			...arr.slice(0, idx),
+			newItem,
+			...arr.slice(idx + 1),
+		];
+	}
+
 	onToggleImportant = (id) => {
-		console.log('On Important Work' , id);
+		this.setState(({ purchaseData }) => {
+
+			return {
+				purchaseData: this.toggleProperty(purchaseData, id, 'important')
+			};
+		});
 	};
 
 	onToggleDone = (id) => {
-		console.log('On Done Work' , id);
+		this.setState(({ purchaseData }) => {
+
+			return {
+				purchaseData: this.toggleProperty(purchaseData, id, 'done')
+			};
+		});
 	};
 
+	onSearchChange = (searchFilter) => {
+		this.setState({ searchFilter });
+	};
+
+	search (items, searchFilter) {
+
+		if (searchFilter.length === 0) {
+			return items;
+		}
+
+		return items.filter((item) => {
+			return item.label.toLowerCase().indexOf(searchFilter.toLowerCase()) > -1;
+		});
+	}
+
+	static purchaseFilter (items, purchaseFilter) {
+		switch (purchaseFilter) {
+			case 'all':
+				return items;
+			case 'active':
+				return items.filter((item) => !item.done);
+			case  'done':
+				return items.filter((item) => item.done);
+			default:
+				return items;
+		}
+	};
+
+
+	onPurchaseFilterChange = (purchaseFilter) => {
+		this.setState({ purchaseFilter });
+
+	};
+
+
+
+
 	render() {
+		const { purchaseData, searchFilter, purchaseFilter } = this.state;
+
+		const visibleItems = App.purchaseFilter(this.search(purchaseData, searchFilter), purchaseFilter );
+
+		const doneCount = purchaseData.filter((el) => el.done).length;
+		const importantCount = purchaseData.length - doneCount;
+
 		return (
 			<div className="buyit-app">
-
 				<DateTime/>
-				<AppHeader toBuy={1} done={3}/>
-
+				<AppHeader toBuy={ importantCount } done={ doneCount }/>
 				<div className="top-panel d-flex">
-					<SearchPanel/>
-					<ItemStatusFilter/>
+					<SearchPanel onSearchChange = { this.onSearchChange }/>
+					<ItemStatusFilter purchaseFilter={ purchaseFilter } onPurchaseFilterChange={ this.onPurchaseFilterChange }/>
 				</div>
-
 				<PurchaseList
-					purchases={this.state.purchaseData}
-					onDeleted={ this.deleteItem}
-					onToggleImportant={this.onToggleImportant}
-					onToggleDone={this.onToggleDone} />
+					purchases={ visibleItems }
+					onDeleted={ this.deleteItem }
+					onToggleImportant={ this.onToggleImportant }
+					onToggleDone={ this.onToggleDone } />
 
 				<PurchaseListItemAdd onItemAdded = { this.addItem } />
 			</div>
